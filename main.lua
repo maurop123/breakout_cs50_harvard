@@ -123,9 +123,10 @@ function love.load()
         highScores = loadHighScores()
     })
 
+    -- TODO TURN MUSIC BACK ON WHEN UR DONE
     -- play our music outside of all states and set it to looping
-    gSounds['music']:play()
-    gSounds['music']:setLooping(true)
+    -- gSounds['music']:play()
+    -- gSounds['music']:setLooping(true)
 
     -- a table we'll use to keep track of which keys have been pressed this
     -- frame, to get around the fact that LÖVE's default callback won't let us
@@ -285,13 +286,16 @@ function renderHealth(health)
 end
 
 --[[
-    Renders the current FPS.
+    Renders debug info like the current FPS.
 ]]
 function displayFPS()
     -- simple FPS display across all states
     love.graphics.setFont(gFonts['small'])
     love.graphics.setColor(0, 1, 0, 1)
     love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 5, 5)
+
+    -- debug powerup timer
+    love.graphics.print('spawnPowerup: ' .. tostring(spawnPowerup), 5, 15)
 end
 
 --[[

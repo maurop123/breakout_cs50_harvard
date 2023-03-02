@@ -34,9 +34,27 @@ function PlayState:enter(params)
     -- give ball random starting velocity
     self.ball.dx = math.random(-200, 200)
     self.ball.dy = math.random(-50, -60)
+
+    -- add a timer for random powerup spawns
+    self.start = love.timer.getTime()
+    self.timerInterval = math.random(5, 10)
 end
 
+-- debug var. make local when done TODO
+spawnPowerup = false
+powerup = {}
+powerup.x = VIRTUAL_HEIGHT / 2
+powerup.y = VIRTUAL_WIDTH / 2
+
 function PlayState:update(dt)
+    -- check timer
+    local now = love.timer.getTime()
+    spawnPowerup = (now - self.start) >= self.timerInterval
+    if spawnPowerup then
+        
+    end
+
+    -- handle pausing
     if self.paused then
         if love.keyboard.wasPressed('space') then
             self.paused = false
@@ -80,6 +98,11 @@ function PlayState:update(dt)
 
         -- only check collision if we're in play
         if brick.inPlay and self.ball:collides(brick) then
+
+            -- random powerup spawn
+            if spawnPowerup then
+
+            end
 
             -- add to score
             self.score = self.score + (brick.tier * 200 + brick.color * 25)
