@@ -133,18 +133,13 @@ function Brick:update(dt)
     self.psystem:update(dt)
 end
 
-function Brick:render(powerupSpawn)
+function Brick:render()
     if self.inPlay then
         love.graphics.draw(gTextures['main'], 
             -- multiply color by 4 (-1) to get our color offset, then add tier to that
             -- to draw the correct tier and color brick onto the screen
             gFrames['bricks'][1 + ((self.color - 1) * 4) + self.tier],
             self.x, self.y)
-    end
-
-    if powerupSpawn or spawnPowerup then
-        love.graphics.draw(gTextures['main'], gFrames['powerups'][1], 
-          powerup.x, powerup.y)
     end
 end
 

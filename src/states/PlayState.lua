@@ -42,17 +42,8 @@ end
 
 -- debug var. make local when done TODO
 spawnPowerup = false
-powerup = {}
-powerup.x = VIRTUAL_HEIGHT / 2
-powerup.y = VIRTUAL_WIDTH / 2
 
 function PlayState:update(dt)
-    -- check timer
-    local now = love.timer.getTime()
-    spawnPowerup = (now - self.start) >= self.timerInterval
-    if spawnPowerup then
-        
-    end
 
     -- handle pausing
     if self.paused then
@@ -99,11 +90,6 @@ function PlayState:update(dt)
         -- only check collision if we're in play
         if brick.inPlay and self.ball:collides(brick) then
 
-            -- random powerup spawn
-            if spawnPowerup then
-
-            end
-
             -- add to score
             self.score = self.score + (brick.tier * 200 + brick.color * 25)
 
@@ -138,16 +124,17 @@ function PlayState:update(dt)
             end
 
             --
-            -- collision code for bricks
-            --
-            -- we check to see if the opposite side of our velocity is outside of the brick;
-            -- if it is, we trigger a collision on that side. else we're within the X + width of
-            -- the brick and should check to see if the top or bottom edge is outside of the brick,
-            -- colliding on the top or bottom accordingly 
-            --
+                -- collision code for bricks
+                --
+                -- we check to see if the opposite side of our velocity is outside of the brick;
+                -- if it is, we trigger a collision on that side. else we're within the X + width of
+                -- the brick and should check to see if the top or bottom edge is outside of the brick,
+                -- colliding on the top or bottom accordingly 
+                --
 
-            -- left edge; only check if we're moving right, and offset the check by a couple of pixels
-            -- so that flush corner hits register as Y flips, not X flips
+                -- left edge; only check if we're moving right, and offset the check by a couple of pixels
+                -- so that flush corner hits register as Y flips, not X flips
+            -- 
             if self.ball.x + 2 < brick.x and self.ball.dx > 0 then
                 
                 -- flip x velocity and reset position outside of brick
@@ -180,6 +167,13 @@ function PlayState:update(dt)
             -- slightly scale the y velocity to speed up the game, capping at +- 150
             if math.abs(self.ball.dy) < 150 then
                 self.ball.dy = self.ball.dy * 1.02
+            end
+
+            -- Spawn powerup at brick if timer is up
+            local now = love.timer.getTime()
+            if (now - self.start) >= self.timerInterval then
+                self.powerup = PowerUp(brick.x + 8, brick.y)
+                spawnPowerup = true
             end
 
             -- only allow colliding with one brick, for corners
@@ -218,6 +212,12 @@ function PlayState:update(dt)
     if love.keyboard.wasPressed('escape') then
         love.event.quit()
     end
+
+    if self.powerup then
+        self.powerup:update(dt)
+        self.start = love.timer.getTime()
+        spawnPowerup = false
+    end
 end
 
 function PlayState:render()
@@ -241,6 +241,11 @@ function PlayState:render()
     if self.paused then
         love.graphics.setFont(gFonts['large'])
         love.graphics.printf("PAUSED", 0, VIRTUAL_HEIGHT / 2 - 16, VIRTUAL_WIDTH, 'center')
+    end
+
+    -- if self.powerup exists, render
+    if self.powerup then
+        self.powerup:render()
     end
 end
 

@@ -20,3 +20,4 @@ VIRTUAL_HEIGHT = 243
 
 -- paddle movement speed
 PADDLE_SPEED = 200
+POWERUP_DROP_SPEED = 100
