@@ -28,7 +28,7 @@ require 'src/LevelMaker'
 require 'src/Paddle'
 
 -- the powerup that drops randomly from bricks hit
-require 'src/PowerUp'
+require 'src/Powerup'
 
 -- a basic StateMachine class which will allow us to transition to and from
 -- game states smoothly and avoid monolithic code in one file

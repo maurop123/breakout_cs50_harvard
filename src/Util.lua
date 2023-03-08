@@ -140,3 +140,24 @@ function GenerateQuadsPowerups(atlas)
 
     return powerupsTbl
 end
+
+--[[
+    General Purpose collides function
+    both a and b must be tables with x, y, height, and width properties
+]]
+function ABCollision(a, b)
+    -- check to see if the left edge of either is farther to the right
+    -- than the right edge of the other
+    if a.x > b.x + b.width or b.x > a.x + a.width then
+        return false
+    end
+
+    -- then check to see if the bottom edge of either is higher than the top
+    -- edge of the other
+    if a.y > b.y + b.height or b.y > a.y + a.height then
+        return false
+    end 
+
+    -- if the above aren't true, they're overlapping
+    return true
+end

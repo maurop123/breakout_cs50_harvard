@@ -42,6 +42,7 @@ end
 
 -- debug var. make local when done TODO
 spawnPowerup = false
+powerupCollided = false
 
 function PlayState:update(dt)
 
@@ -62,6 +63,12 @@ function PlayState:update(dt)
     -- update positions based on velocity
     self.paddle:update(dt)
     self.ball:update(dt)
+
+    if self.powerup then
+        self.powerup:update(dt)
+        self.start = love.timer.getTime()
+        spawnPowerup = false
+    end
 
     if self.ball:collides(self.paddle) then
         -- raise ball above paddle in case it goes below it, then reverse dy
@@ -169,16 +176,22 @@ function PlayState:update(dt)
                 self.ball.dy = self.ball.dy * 1.02
             end
 
-            -- Spawn powerup at brick if timer is up
+            -- Given collision, spawn powerup at brick if timer is up
             local now = love.timer.getTime()
             if (now - self.start) >= self.timerInterval then
-                self.powerup = PowerUp(brick.x + 8, brick.y)
+                self.powerup = Powerup(brick.x + 8, brick.y)
                 spawnPowerup = true
             end
 
             -- only allow colliding with one brick, for corners
             break
         end
+    end
+
+    -- detect collision between powerups and paddle
+    -- if self.powerup and self.powerup.x > self.paddle.x then
+    if self.powerup and ABCollision(self.paddle, self.powerup) then
+        powerupCollided = true
     end
 
     -- if ball goes below bounds, revert to serve state and decrease health
@@ -211,12 +224,6 @@ function PlayState:update(dt)
 
     if love.keyboard.wasPressed('escape') then
         love.event.quit()
-    end
-
-    if self.powerup then
-        self.powerup:update(dt)
-        self.start = love.timer.getTime()
-        spawnPowerup = false
     end
 end
 
