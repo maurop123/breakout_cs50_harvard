@@ -72,13 +72,31 @@ function PlayState:update(dt)
         if ABCollision(self.paddle, self.powerup) then
             powerupCollided = true
             self.powerup = nil
+
             -- TODO spawn two more balls
+            local ball1 = Ball()
+            ball1.x = self.paddle.x + (self.paddle.width / 2) - 4
+            ball1.y = self.paddle.y - 8
+            ball1.dx = math.random(-200, 200)
+            ball1.dy = math.random(-50, -60)
+            ball1.skin = math.random(7)
+            table.insert(self.balls, ball1)
+
+            local ball2 = Ball()
+            ball2.x = self.paddle.x + (self.paddle.width / 2) - 4
+            ball2.y = self.paddle.y - 8
+            ball2.dx = math.random(-200, 200)
+            ball2.dy = math.random(-50, -60)
+            ball2.skin = math.random(7)
+            table.insert(self.balls, ball2)
         end
     end
 
 
     -- update positions based on velocity
     self.paddle:update(dt)
+
+    -- Balls code
     for l, ball in pairs(self.balls) do
       ball:update(dt)
 
@@ -224,7 +242,6 @@ function PlayState:update(dt)
 
           gSounds['paddle-hit']:play()
       end
-
     end
 
     -- for rendering particle systems
