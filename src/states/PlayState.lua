@@ -74,12 +74,11 @@ function PlayState:update(dt)
             self.powerup = nil
 
             -- TODO spawn two more balls
-            local ball1 = Ball()
+            local ball1 = Ball(math.random(7)) -- random skin
             ball1.x = self.paddle.x + (self.paddle.width / 2) - 4
             ball1.y = self.paddle.y - 8
             ball1.dx = math.random(-200, 200)
             ball1.dy = math.random(-50, -60)
-            ball1.skin = math.random(7)
             table.insert(self.balls, ball1)
 
             local ball2 = Ball()
@@ -101,6 +100,35 @@ function PlayState:update(dt)
       ball:update(dt)
 
       self.ball = ball
+
+      -- if ball goes below bounds, and it's the last ball in self.balls
+      -- revert to serve state and decrease health
+      if self.ball.y >= VIRTUAL_HEIGHT then
+        if #self.balls == 1 then
+          self.health = self.health - 1
+          gSounds['hurt']:play()
+
+          if self.health == 0 then
+              gStateMachine:change('game-over', {
+                  score = self.score,
+                  highScores = self.highScores
+              })
+          else
+              gStateMachine:change('serve', {
+                  paddle = self.paddle,
+                  bricks = self.bricks,
+                  health = self.health,
+                  score = self.score,
+                  highScores = self.highScores,
+                  level = self.level,
+                  recoverPoints = self.recoverPoints
+              })
+          end
+        else
+          table.remove(self.balls, l)
+        end
+      end
+
 
       -- detect collision across all bricks with the ball
       for k, brick in pairs(self.bricks) do
@@ -199,29 +227,7 @@ function PlayState:update(dt)
           end
       end
 
-      -- if ball goes below bounds, revert to serve state and decrease health
-      if self.ball.y >= VIRTUAL_HEIGHT then
-          self.health = self.health - 1
-          gSounds['hurt']:play()
-
-          if self.health == 0 then
-              gStateMachine:change('game-over', {
-                  score = self.score,
-                  highScores = self.highScores
-              })
-          else
-              gStateMachine:change('serve', {
-                  paddle = self.paddle,
-                  bricks = self.bricks,
-                  health = self.health,
-                  score = self.score,
-                  highScores = self.highScores,
-                  level = self.level,
-                  recoverPoints = self.recoverPoints
-              })
-          end
-      end
-
+      -- ball hits the paddle
       if self.ball:collides(self.paddle) then
           -- raise ball above paddle in case it goes below it, then reverse dy
           self.ball.y = self.paddle.y - 8
