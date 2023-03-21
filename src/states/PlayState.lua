@@ -110,7 +110,7 @@ function PlayState:update(dt)
           gSounds['hurt']:play()
 
           -- shrink paddle
-          self.paddle.size = math.max(1, self.paddle.size - 1)
+          self.paddle:shrink()
 
           if self.health == 0 then
               gStateMachine:change('game-over', {
@@ -160,7 +160,7 @@ function PlayState:update(dt)
 
               -- grow paddle if score enough points
               if self.score > self.growPaddlePoints then
-                  self.paddle.size = math.min(self.paddle.size + 1, 4) -- don't go over 4
+                  self.paddle:grow()
                   self.growPaddlePoints = self.growPaddlePoints + 1000
               end
 
