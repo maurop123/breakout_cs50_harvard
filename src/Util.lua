@@ -59,6 +59,17 @@ function GenerateQuadsBricks(atlas)
 end
 
 --[[
+    Locked brick Quad
+]]
+function GenerateLockedBrickQuad(atlas)
+  local height = 16
+  local width = 32
+  local y = height * 3
+  local x = width * 5
+  return love.graphics.newQuad(x, y, width, height, atlas:getDimensions())
+end
+
+--[[
     This function is specifically made to piece out the paddles from the
     sprite sheet. For this, we have to piece out the paddles a little more
     manually, since they are all different sizes.
