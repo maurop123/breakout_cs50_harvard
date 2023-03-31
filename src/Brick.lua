@@ -64,7 +64,7 @@ function Brick:init(x, y)
     self.inPlay = true
 
     -- used to determine whether the brick is locked
-    self.locked = true
+    self.locked = false
 
     -- particle system belonging to the brick, emitted on hit
     self.psystem = love.graphics.newParticleSystem(gTextures['particle'], 64)

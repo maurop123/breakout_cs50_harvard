@@ -47,6 +47,9 @@ function LevelMaker.createMap(level)
     -- highest color of the highest tier, no higher than 5
     local highestColor = math.min(5, level % 5 + 3)
 
+    -- track whether a locked brick as been generated
+    local hasLockedBrick = false
+
     -- lay out bricks such that they touch each other and fill the space
     for y = 1, numRows do
         -- whether we want to enable skipping for this row
@@ -111,6 +114,13 @@ function LevelMaker.createMap(level)
                 b.color = solidColor
                 b.tier = solidTier
             end 
+
+            -- randomly lock one brick
+            -- 0.15 better for a real game. not just demo
+            if math.random(0, 10) < 0.5 and not hasLockedBrick then
+                hasLockedBrick = true
+                b.locked = true
+            end
 
             table.insert(bricks, b)
 
