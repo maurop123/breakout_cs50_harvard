@@ -43,9 +43,6 @@ function PlayState:enter(params)
     self.timerInterval = math.random(5, 10)
 end
 
--- debug var. make local when done TODO
-spawnPowerup = false
-powerupCollided = false
 
 function PlayState:update(dt)
 
@@ -67,11 +64,9 @@ function PlayState:update(dt)
     if self.powerup then
         self.powerup:update(dt)
         self.start = love.timer.getTime()
-        spawnPowerup = false
 
         -- collision detection
         if ABCollision(self.paddle, self.powerup) then
-            powerupCollided = true
             self.powerup = nil
 
             -- TODO spawn two more balls
@@ -229,7 +224,6 @@ function PlayState:update(dt)
               local now = love.timer.getTime()
               if (now - self.start) >= self.timerInterval then
                   self.powerup = Powerup(brick.x + 8, brick.y)
-                  spawnPowerup = true
               end
 
               -- only allow colliding with one brick, for corners

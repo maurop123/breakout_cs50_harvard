@@ -296,8 +296,8 @@ function displayFPS()
     love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 5, 5)
 
     -- debug powerup timer
-    love.graphics.print('spawnPowerup: ' .. tostring(spawnPowerup), 5, 15)
-    love.graphics.print('powerupCollided: ' .. tostring(powerupCollided), 5, 25)
+    -- love.graphics.print('spawnPowerup: ' .. tostring(spawnPowerup), 5, 15)
+    -- love.graphics.print('powerupCollided: ' .. tostring(powerupCollided), 5, 25)
 end
 
 --[[
