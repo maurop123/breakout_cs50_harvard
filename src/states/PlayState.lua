@@ -41,6 +41,10 @@ function PlayState:enter(params)
     -- add a timer for random powerup spawns
     self.start = love.timer.getTime()
     self.timerInterval = math.random(5, 10)
+
+    -- if bricks has one that is locked
+    self.hasLockedBrick = false
+    self.unlockBrick = false
 end
 
 
@@ -67,23 +71,28 @@ function PlayState:update(dt)
 
         -- collision detection
         if ABCollision(self.paddle, self.powerup) then
+            if self.powerup.powerupType == 1 then
+              -- multiple balls powerup
+                local ball1 = Ball(math.random(7)) -- random skin
+                ball1.x = self.paddle.x + (self.paddle.width / 2) - 4
+                ball1.y = self.paddle.y - 8
+                ball1.dx = math.random(-200, 200)
+                ball1.dy = math.random(-50, -60)
+                table.insert(self.balls, ball1)
+
+                local ball2 = Ball()
+                ball2.x = self.paddle.x + (self.paddle.width / 2) - 4
+                ball2.y = self.paddle.y - 8
+                ball2.dx = math.random(-200, 200)
+                ball2.dy = math.random(-50, -60)
+                ball2.skin = math.random(7)
+                table.insert(self.balls, ball2)
+            else
+              -- locked brick powerup
+                self.unlockBrick = true
+            end
+
             self.powerup = nil
-
-            -- TODO spawn two more balls
-            local ball1 = Ball(math.random(7)) -- random skin
-            ball1.x = self.paddle.x + (self.paddle.width / 2) - 4
-            ball1.y = self.paddle.y - 8
-            ball1.dx = math.random(-200, 200)
-            ball1.dy = math.random(-50, -60)
-            table.insert(self.balls, ball1)
-
-            local ball2 = Ball()
-            ball2.x = self.paddle.x + (self.paddle.width / 2) - 4
-            ball2.y = self.paddle.y - 8
-            ball2.dx = math.random(-200, 200)
-            ball2.dy = math.random(-50, -60)
-            ball2.skin = math.random(7)
-            table.insert(self.balls, ball2)
         end
     end
 
@@ -135,43 +144,45 @@ function PlayState:update(dt)
           -- only check collision if we're in play
           if brick.inPlay and self.ball:collides(brick) then
 
-              -- add to score
-              self.score = self.score + (brick.tier * 200 + brick.color * 25)
+              if not brick.locked then
+                  -- add to score
+                  self.score = self.score + (brick.tier * 200 + brick.color * 25)
 
-              -- trigger the brick's hit function, which removes it from play
-              brick:hit()
+                  -- trigger the brick's hit function, which removes it from play
+                  brick:hit()
 
-              -- if we have enough points, recover a point of health
-              if self.score > self.recoverPoints then
-                  -- can't go above 3 health
-                  self.health = math.min(3, self.health + 1)
+                  -- if we have enough points, recover a point of health
+                  if self.score > self.recoverPoints then
+                      -- can't go above 3 health
+                      self.health = math.min(3, self.health + 1)
 
-                  -- multiply recover points by 2
-                  self.recoverPoints = self.recoverPoints + math.min(100000, self.recoverPoints * 2)
+                      -- multiply recover points by 2
+                      self.recoverPoints = self.recoverPoints + math.min(100000, self.recoverPoints * 2)
 
-                  -- play recover sound effect
-                  gSounds['recover']:play()
-              end
+                      -- play recover sound effect
+                      gSounds['recover']:play()
+                  end
 
-              -- grow paddle if score enough points
-              if self.score > self.growPaddlePoints then
-                  self.paddle:grow()
-                  self.growPaddlePoints = self.growPaddlePoints + 1000
-              end
+                  -- grow paddle if score enough points
+                  if self.score > self.growPaddlePoints then
+                      self.paddle:grow()
+                      self.growPaddlePoints = self.growPaddlePoints + 1000
+                  end
 
-              -- go to our victory screen if there are no more bricks left
-              if self:checkVictory() then
-                  gSounds['victory']:play()
+                  -- go to our victory screen if there are no more bricks left
+                  if self:checkVictory() then
+                      gSounds['victory']:play()
 
-                  gStateMachine:change('victory', {
-                      level = self.level,
-                      paddle = self.paddle,
-                      health = self.health,
-                      score = self.score,
-                      highScores = self.highScores,
-                      ball = self.ball,
-                      recoverPoints = self.recoverPoints
-                  })
+                      gStateMachine:change('victory', {
+                          level = self.level,
+                          paddle = self.paddle,
+                          health = self.health,
+                          score = self.score,
+                          highScores = self.highScores,
+                          ball = self.ball,
+                          recoverPoints = self.recoverPoints
+                      })
+                  end
               end
 
               --
@@ -223,7 +234,7 @@ function PlayState:update(dt)
               -- Given collision, spawn powerup at brick if timer is up
               local now = love.timer.getTime()
               if (now - self.start) >= self.timerInterval then
-                  self.powerup = Powerup(brick.x + 8, brick.y)
+                  self.powerup = Powerup(brick.x + 8, brick.y, self.hasLockedBrick)
               end
 
               -- only allow colliding with one brick, for corners
@@ -267,6 +278,15 @@ end
 function PlayState:render()
     -- render bricks
     for k, brick in pairs(self.bricks) do
+        if brick.locked then
+            if self.unlockBrick then
+                brick.locked = false
+                self.hasLockedBrick = false
+            else
+                self.hasLockedBrick = true
+            end
+        end
+
         brick:render()
     end
 

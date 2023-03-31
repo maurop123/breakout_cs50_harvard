@@ -1,6 +1,6 @@
 Powerup = Class{}
 
-function Powerup:init(x, y)
+function Powerup:init(x, y, lockedBrickPresent)
     self.x = x
     self.y = y
     self.dy = 0
@@ -11,6 +11,12 @@ function Powerup:init(x, y)
     -- add a timer for random powerup spawns
     self.start = love.timer.getTime()
     self.timerInterval = math.random(5, 10)
+
+    if lockedBrickPresent and math.random(0, 10) < 5 then
+        self.powerupType = 2
+    else
+        self.powerupType = 1
+    end
 end
 
 function Powerup:update(dt)
@@ -19,5 +25,11 @@ function Powerup:update(dt)
 end
 
 function Powerup:render()
-    love.graphics.draw(gTextures['main'], gFrames['powerups'][1], self.x, self.y)
+    if self.powerupType == 2 then
+        -- brick unlock powerup
+        love.graphics.draw(gTextures['main'], gFrames['powerups'][2], self.x, self.y)
+    else
+        -- multiple balls powerup
+        love.graphics.draw(gTextures['main'], gFrames['powerups'][1], self.x, self.y)
+    end
 end
